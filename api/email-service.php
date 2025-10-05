@@ -7,7 +7,17 @@ class EmailService {
     private $fromName;
 
     public function __construct() {
-        $this->teamDataFile = '../src/data/data.json';
+        // Resolve team data path for both local dev and cPanel deploy
+        $candidates = [
+            __DIR__ . '/../src-data/data.json',   // deployment (we ship src-data)
+            __DIR__ . '/../src/data/data.json',   // local dev
+            __DIR__ . '/../data/data.json',       // fallback
+        ];
+        $resolved = null;
+        foreach ($candidates as $path) {
+            if (file_exists($path)) { $resolved = $path; break; }
+        }
+        $this->teamDataFile = $resolved;
         
         // Load email configuration
         $this->config = include 'email-config.php';
