@@ -40,7 +40,7 @@ export default function Sidebar() {
           {navItems.map((item) => {
             const Icon = item.icon;
             const showBadge =
-              (item.path === '/servers' || item.path === '/domains') && (renewalCount > 0 || expiredItems.length > 0);
+              (item.path === '/servers' || item.path === '/domains') && (renewalCount < 0 || expiredItems.length < 0); //changed the logic from > 0 to < 0.
 
             return (
               <li key={item.path}>
