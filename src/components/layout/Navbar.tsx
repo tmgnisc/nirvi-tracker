@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../../contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { Search, Moon, Sun, LogOut, User, Bell, AlertTriangle, Clock, X } from 'lucide-react';
-import { Input } from '../ui/input';
+import { LogOut, User, Bell, AlertTriangle, Clock, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
@@ -13,15 +12,23 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { getRenewalCount, getExpiredItems, getDaysUntil, projects, domains } from '../../utils/dataLoader';
 
 export default function Navbar() {
-  const { user, logout, darkMode, toggleDarkMode, searchQuery, setSearchQuery } = useApp();
+  const { user, logout } = useApp();
   const navigate = useNavigate();
-  const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);  // New state for logout dialog
 
   const renewalCount = getRenewalCount();
   const expiredItems = getExpiredItems();
@@ -72,9 +79,14 @@ export default function Navbar() {
 
   const urgentRenewals = getUrgentRenewals();
 
-  const handleLogout = () => {
+  const handleLogoutConfirm = () => {
     logout();
-    navigate('/');
+    navigate('/');  // Now safe to navigate after confirm—sidebar hides only after dialog closes
+    setShowLogoutDialog(false);
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutDialog(false);
   };
 
   return (
@@ -82,59 +94,9 @@ export default function Navbar() {
       initial={{ y: -80 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.3 }}
-      className="fixed top-0 right-0 left-64 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-30 flex items-center justify-between px-6"
+      className="fixed top-0 right-0 left-64 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-30 flex items-center justify-end px-6"
     >
-      <div className="flex items-center gap-4 flex-1">
-        <motion.div
-          className="relative flex-1 max-w-xl"
-          initial={false}
-          animate={{ width: showSearch ? '100%' : 'auto' }}
-        >
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input
-            type="text"
-            placeholder="Search projects, clients, domains, servers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setShowSearch(true)}
-            onBlur={() => setShowSearch(false)}
-            className="pl-10 h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
-          />
-        </motion.div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleDarkMode}
-          className="relative w-10 h-10 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-        >
-          <AnimatePresence mode="wait">
-            {darkMode ? (
-              <motion.div
-                key="sun"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Sun className="w-5 h-5" />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="moon"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Moon className="w-5 h-5" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </Button>
-
+      <div className="flex items-center gap-3">  
         <Button
           variant="ghost"
           size="icon"
@@ -169,7 +131,10 @@ export default function Navbar() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
+            <DropdownMenuItem 
+              onClick={() => setShowLogoutDialog(true)}  // Open dialog instead of direct logout
+              className="text-red-600 cursor-pointer"
+            >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </DropdownMenuItem>
@@ -257,6 +222,26 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Logout Dialog - Similar to bell drawer for stable layout */}
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Logout</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to log out? You'll need to sign in again to access your account.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleLogoutCancel}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleLogoutConfirm}>
+              Log Out
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.nav>
   );
 }
