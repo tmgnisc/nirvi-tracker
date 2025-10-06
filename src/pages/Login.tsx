@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useApp } from '../contexts/AppContext';
+import { useApp } from 'src/components/contexts/AppContext.tsx';
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -13,7 +13,7 @@ export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const { login } = useApp();
+  const { login, managerLogin } = useApp();
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -23,10 +23,18 @@ export default function Login() {
 
     setTimeout(() => {
       const success = login(username, password);
+      const success1 = managerLogin(username, password);
       if (success) {
         toast({
           title: "Login Successful!",
           description: "Welcome to Nirvi Track",
+          variant: "default",
+        });
+        navigate('/dashboard');
+      } else if (success1) {
+        toast({
+          title: "Login Successful!",
+          description: "Welcome Project Manager to Nirvi Track",
           variant: "default",
         });
         navigate('/dashboard');
@@ -38,6 +46,7 @@ export default function Login() {
         });
         setIsLoading(false);
       }
+      setIsLoading(false);
     }, 800);
   };
 
@@ -109,7 +118,6 @@ export default function Login() {
                 />
               </div>
 
-
               <Button
                 type="submit"
                 className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium"
@@ -117,7 +125,6 @@ export default function Login() {
               >
                 {isLoading ? 'Signing in...' : 'Sign In'}
               </Button>
-
             </form>
           </CardContent>
         </Card>
