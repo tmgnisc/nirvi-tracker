@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useApp } from '../../contexts/AppContext';
+import { useApp } from '../contexts/AppContext.tsx';
 import { useNavigate } from 'react-router-dom';
 import { LogOut, User, Bell, AlertTriangle, Clock, X } from 'lucide-react';
 import { Button } from '../ui/button';
