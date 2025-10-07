@@ -92,7 +92,6 @@ export default function Dashboard() {
     { title: 'Live Websites', value: totalWebsites, icon: DollarSign, color: 'purple', change: `${upcomingProjects} in development` },
   ];
 
-
   return (
     <motion.div
       variants={containerVariants}
@@ -135,9 +134,10 @@ export default function Dashboard() {
         })}
       </div>
 
+      {/* Responsive Grid for Email Action, Line Chart, and Pie Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Quick action: Send Welcome Email */}
-        <motion.div variants={itemVariants}>
+        {/* Quick action: Send Welcome Email - Full width on mobile, 1/3 on lg */}
+        <motion.div variants={itemVariants} className="lg:col-span-1">
           <Card className="border-0 shadow-lg">
             <CardHeader>
               <CardTitle>Team Email Actions</CardTitle>
@@ -168,6 +168,8 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </motion.div>
+
+        {/* Project Starts Over Time - Full width on mobile/tablet, 2/3 on lg */}
         <motion.div variants={itemVariants} className="lg:col-span-2">
           <Card className="border-0 shadow-lg">
             <CardHeader>
@@ -201,8 +203,12 @@ export default function Dashboard() {
             </CardContent>
           </Card>
         </motion.div>
+      </div>
 
-        <motion.div variants={itemVariants}>
+      {/* Project Status - Full width across all breakpoints */}
+      {/* Project Status - Right-aligned in a 3-column grid, spanning right 2/3 on lg+ */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <motion.div variants={itemVariants} className="lg:col-start-2 lg:col-span-2">  {/* Starts at col 2, spans 2 cols: right-aligned */}
           <Card className="border-0 shadow-lg">
             <CardHeader>
               <CardTitle>Project Status</CardTitle>
@@ -228,7 +234,7 @@ export default function Dashboard() {
                   <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="mt-4 grid grid-cols-2 gap-2">
+              <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
                 {statusData.map((item) => (
                   <div key={item.name} className="flex items-center gap-2">
                     <div
