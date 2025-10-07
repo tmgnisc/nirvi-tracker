@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { useApp } from '../contexts/AppContext';
+import { useApp } from '../contexts/AppContext'; // Kept useApp
 import { Button } from '../components/ui/button';
 import { Input } from '../components/ui/input';
 import { Label } from '../components/ui/label';
@@ -12,33 +12,55 @@ import logo from '../assets/logo.png';
 export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-  const { login } = useApp();
+  const { login, managerLogin, loading } = useApp(); // Use context loading
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  // Debug log
+  console.log('Login component rendered');
 
-    setTimeout(() => {
-      const success = login(username, password);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    console.log('Form submitted:', { username, password }); // Debug
+
+    try {
+      let success = false;
+      let role = '';
+
+      // Try Admin login first
+      success = await login(username, password);
+      if (success) {
+        role = 'Admin';
+      } else {
+        // Try Manager login
+        success = await managerLogin(username, password);
+        if (success) {
+          role = 'Project Manager';
+        }
+      }
+
       if (success) {
         toast({
-          title: "Login Successful!",
-          description: "Welcome to Nirvi Track",
-          variant: "default",
+          title: 'Login Successful!',
+          description: `Welcome ${role} to Nirvi Track`,
+          variant: 'default',
         });
         navigate('/dashboard');
       } else {
         toast({
-          title: "Login Failed",
-          description: "Invalid username or password. Please try again.",
-          variant: "destructive",
+          title: 'Login Failed',
+          description: 'Invalid username or password. Please try again.',
+          variant: 'destructive',
         });
-        setIsLoading(false);
       }
-    }, 800);
+    } catch (error) {
+      console.error('Login error:', error);
+      toast({
+        title: 'Error',
+        description: 'An unexpected error occurred. Please try again.',
+        variant: 'destructive',
+      });
+    }
   };
 
   return (
@@ -53,12 +75,7 @@ export default function Login() {
           repeat: Infinity,
           repeatType: 'reverse',
         }}
-        style={{
-          backgroundImage: 'radial-gradient(circle at 20% 50%, rgba(59, 130, 246, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.3) 0%, transparent 50%)',
-          backgroundSize: '100% 100%',
-        }}
       />
-
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -94,6 +111,7 @@ export default function Login() {
                   onChange={(e) => setUsername(e.target.value)}
                   required
                   className="h-11"
+                  disabled={loading}
                 />
               </div>
               <div className="space-y-2">
@@ -106,18 +124,16 @@ export default function Login() {
                   onChange={(e) => setPassword(e.target.value)}
                   required
                   className="h-11"
+                  disabled={loading}
                 />
               </div>
-
-
               <Button
                 type="submit"
                 className="w-full h-11 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium"
-                disabled={isLoading}
+                disabled={loading}
               >
-                {isLoading ? 'Signing in...' : 'Sign In'}
+                {loading ? 'Signing in...' : 'Sign In'}
               </Button>
-
             </form>
           </CardContent>
         </Card>
