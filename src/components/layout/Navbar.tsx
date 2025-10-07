@@ -2,8 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../../contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { Search, Moon, Sun, LogOut, User, Bell, AlertTriangle, Clock, X } from 'lucide-react';
-import { Input } from '../ui/input';
+import { LogOut, User, Bell, AlertTriangle, Clock, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import {
   DropdownMenu,
@@ -13,21 +12,28 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../ui/dropdown-menu';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '../ui/dialog';
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { getRenewalCount, getExpiredItems, getDaysUntil, projects, domains } from '../../utils/dataLoader';
 
 export default function Navbar() {
-  const { user, logout, darkMode, toggleDarkMode, searchQuery, setSearchQuery } = useApp();
+  const { user, logout } = useApp();
   const navigate = useNavigate();
-  const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showLogoutDialog, setShowLogoutDialog] = useState(false);
 
   const renewalCount = getRenewalCount();
   const expiredItems = getExpiredItems();
   const totalAlerts = expiredItems.length > 0 ? expiredItems.length : renewalCount;
 
-  // Get urgent renewals (within 7 days)
   const getUrgentRenewals = () => {
     const urgentItems: Array<{
       name: string;
@@ -72,9 +78,14 @@ export default function Navbar() {
 
   const urgentRenewals = getUrgentRenewals();
 
-  const handleLogout = () => {
+  const handleLogoutConfirm = () => {
     logout();
     navigate('/');
+    setShowLogoutDialog(false);
+  };
+
+  const handleLogoutCancel = () => {
+    setShowLogoutDialog(false);
   };
 
   return (
@@ -82,64 +93,14 @@ export default function Navbar() {
       initial={{ y: -80 }}
       animate={{ y: 0 }}
       transition={{ duration: 0.3 }}
-      className="fixed top-0 right-0 left-64 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 z-30 flex items-center justify-between px-6"
+      className="fixed top-0 right-0 left-64 h-16 bg-white/80 backdrop-blur-md border-b border-slate-200 z-30 flex items-center justify-end px-6"
     >
-      <div className="flex items-center gap-4 flex-1">
-        <motion.div
-          className="relative flex-1 max-w-xl"
-          initial={false}
-          animate={{ width: showSearch ? '100%' : 'auto' }}
-        >
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <Input
-            type="text"
-            placeholder="Search projects, clients, domains, servers..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onFocus={() => setShowSearch(true)}
-            onBlur={() => setShowSearch(false)}
-            className="pl-10 h-10 bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
-          />
-        </motion.div>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <Button
-          variant="ghost"
-          size="icon"
-          onClick={toggleDarkMode}
-          className="relative w-10 h-10 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
-        >
-          <AnimatePresence mode="wait">
-            {darkMode ? (
-              <motion.div
-                key="sun"
-                initial={{ rotate: -90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: 90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Sun className="w-5 h-5" />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="moon"
-                initial={{ rotate: 90, opacity: 0 }}
-                animate={{ rotate: 0, opacity: 1 }}
-                exit={{ rotate: -90, opacity: 0 }}
-                transition={{ duration: 0.2 }}
-              >
-                <Moon className="w-5 h-5" />
-              </motion.div>
-            )}
-          </AnimatePresence>
-        </Button>
-
+      <div className="flex items-center gap-3">  
         <Button
           variant="ghost"
           size="icon"
           onClick={() => setShowNotifications(!showNotifications)}
-          className="relative w-10 h-10 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+          className="relative w-10 h-10 rounded-lg hover:bg-slate-100"
         >
           <Bell className="w-5 h-5" />
           {totalAlerts > 0 && (
@@ -153,7 +114,7 @@ export default function Navbar() {
           <DropdownMenuTrigger asChild>
             <Button
               variant="ghost"
-              className="flex items-center gap-2 h-10 px-3 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+              className="flex items-center gap-2 h-10 px-3 rounded-lg hover:bg-slate-100"
             >
               <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />
@@ -169,7 +130,10 @@ export default function Navbar() {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={handleLogout} className="text-red-600 cursor-pointer">
+            <DropdownMenuItem 
+              onClick={() => setShowLogoutDialog(true)}
+              className="text-red-600 cursor-pointer"
+            >
               <LogOut className="w-4 h-4 mr-2" />
               Logout
             </DropdownMenuItem>
@@ -177,7 +141,6 @@ export default function Navbar() {
         </DropdownMenu>
       </div>
 
-      {/* Notification Drawer */}
       <AnimatePresence>
         {showNotifications && (
           <motion.div
@@ -185,7 +148,7 @@ export default function Navbar() {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: 100 }}
             transition={{ duration: 0.2 }}
-            className="fixed top-16 right-6 w-96 max-h-96 overflow-y-auto bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg shadow-xl z-40"
+            className="fixed top-16 right-6 w-96 max-h-96 overflow-y-auto bg-white border border-slate-200 rounded-lg shadow-xl z-40"
           >
             <Card className="border-0">
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
@@ -202,18 +165,18 @@ export default function Navbar() {
               <CardContent className="space-y-3">
                 {expiredItems.length > 0 && (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-red-600 dark:text-red-400">
+                    <div className="flex items-center gap-2 text-red-600">
                       <AlertTriangle className="w-4 h-4" />
                       <span className="font-medium">Expired Items</span>
                     </div>
                     {expiredItems.map((item, index) => (
-                      <div key={index} className="p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-lg">
+                      <div key={index} className="p-3 bg-red-50 border border-red-200 rounded-lg">
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="font-medium text-red-800 dark:text-red-200">{item.name}</p>
-                            <p className="text-sm text-red-600 dark:text-red-400">{item.type}</p>
+                            <p className="font-medium text-red-800">{item.name}</p>
+                            <p className="text-sm text-red-600">{item.type}</p>
                           </div>
-                          <Badge className="bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300">
+                          <Badge className="bg-red-100 text-red-700">
                             Expired
                           </Badge>
                         </div>
@@ -224,19 +187,19 @@ export default function Navbar() {
 
                 {urgentRenewals.length > 0 && (
                   <div className="space-y-2">
-                    <div className="flex items-center gap-2 text-orange-600 dark:text-orange-400">
+                    <div className="flex items-center gap-2 text-orange-600">
                       <Clock className="w-4 h-4" />
                       <span className="font-medium">Urgent Renewals</span>
                     </div>
                     {urgentRenewals.map((item, index) => (
-                      <div key={index} className="p-3 bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-800 rounded-lg">
+                      <div key={index} className="p-3 bg-orange-50 border border-orange-200 rounded-lg">
                         <div className="flex items-start justify-between">
                           <div>
-                            <p className="font-medium text-orange-800 dark:text-orange-200">{item.name}</p>
-                            <p className="text-sm text-orange-600 dark:text-orange-400">{item.type}</p>
-                            <p className="text-xs text-orange-500 dark:text-orange-500">{item.renewalDate}</p>
+                            <p className="font-medium text-orange-800">{item.name}</p>
+                            <p className="text-sm text-orange-600">{item.type}</p>
+                            <p className="text-xs text-orange-500">{item.renewalDate}</p>
                           </div>
-                          <Badge className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">
+                          <Badge className="bg-orange-100 text-orange-700">
                             {item.daysUntil} days
                           </Badge>
                         </div>
@@ -247,9 +210,9 @@ export default function Navbar() {
 
                 {expiredItems.length === 0 && urgentRenewals.length === 0 && (
                   <div className="text-center py-8">
-                    <Bell className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600 mb-3" />
-                    <p className="text-slate-500 dark:text-slate-400">No notifications</p>
-                    <p className="text-sm text-slate-400 dark:text-slate-500">All renewals are up to date</p>
+                    <Bell className="w-12 h-12 mx-auto text-slate-300 mb-3" />
+                    <p className="text-slate-500">No notifications</p>
+                    <p className="text-sm text-slate-400">All renewals are up to date</p>
                   </div>
                 )}
               </CardContent>
@@ -257,6 +220,25 @@ export default function Navbar() {
           </motion.div>
         )}
       </AnimatePresence>
+
+      <Dialog open={showLogoutDialog} onOpenChange={setShowLogoutDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Confirm Logout</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to log out? You'll need to sign in again to access your account.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={handleLogoutCancel}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleLogoutConfirm}>
+              Log Out
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </motion.nav>
   );
 }
