@@ -1,487 +1,505 @@
 {
-  "projects": [
-    {
-      "name": "Damaru Resources",
-      "url": "https://damaruresources.com/",
-      "type": "Consultancy Website",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh Bajracharya",
-      "renewalDate": "Friday, September 11, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Ekathas",
-      "url": "https://ekathas.com/",
-      "type": "Blogging Website",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Sunday, November 9, 2025",
-      "status": "Active"
-    },
-    {
-      "name": "Ainaa TV",
-      "url": "https://ainaatv.com/",
-      "type": "News Portal",
-      "techStack": "WordPress",
-      "handledBy": "Nischal",
-      "renewalDate": "Friday, May 15, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Nirvix Technology",
-      "url": "https://nirvixtech.com/",
-      "type": "Company Website",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Friday, May 8, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Serophero Online",
-      "url": "https://seropheroonline.com/",
-      "type": "News Portal",
-      "techStack": "WordPress",
-      "handledBy": "Nischal",
-      "renewalDate": "Tuesday, April 21, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Global Rising Travel",
-      "url": "https://globalrisingtravel.com/",
-      "type": "Tours & Travel",
-      "techStack": "WordPress",
-      "handledBy": "Nischal & Sajesh",
-      "renewalDate": "Tuesday, September 1, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Serophero Trekking",
-      "url": "https://trekking.seropheroonline.com",
-      "type": "Trekking Website",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Not purchased yet",
-      "status": "Under Development"
-    },
-    {
-      "name": "Sukilo Properties",
-      "url": "http://sukiloproperties.ae/",
-      "type": "Real Estate",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Tuesday, August 11, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Zen Career Hub",
-      "url": "https://zencareerhub.ae/",
-      "type": "Job Portal",
-      "techStack": "React + Django",
-      "handledBy": "Nischal & Sanjiv",
-      "renewalDate": "No Renewal (Handover Complete)",
-      "status": "Delivered"
-    },
-    {
-      "name": "LevelUp Education",
-      "url": "http://levelup.edu.np/",
-      "type": "Consultancy",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Monday, September 15, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "DeepTech",
-      "url": "https://deeptech.com.np/",
-      "type": "Ecommerce",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Monday, September 15, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "PSPK Electronics",
-      "url": "https://pspkelectronics.ae/",
-      "type": "Commerce Website",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Tuesday, August 11, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Leaf Travels and Tour",
-      "url": "https://leaftravelsandtour.com/",
-      "type": "Tours & Travel",
-      "techStack": "WordPress",
-      "handledBy": "Dibin",
-      "renewalDate": "Friday, September 18, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Andre Vaillancourt",
-      "url": "https://andrevaillancourt.com/",
-      "type": "Personal Portfolio",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Friday, May 8, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Everest WC",
-      "url": "https://everestwc.com/",
-      "type": "Consultancy & Manpower",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Tuesday, March 3, 2026",
-      "status": "On Hold"
-    },
-    { "name": "Khalipana", "status": "Terminated" },
-    { "name": "Lagaula", "status": "Terminated" },
-    {
-      "name": "Towing by SBCS",
-      "url": "https://towingbysbcs.com/",
-      "type": "Towing Company",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Thursday, June 11, 2026",
-      "status": "Active"
-    },
-    { "name": "Education Community Health", "status": "Terminated" },
-    { "name": "Oz Nepal Services", "status": "Terminated" },
-    {
-      "name": "Nepal NCEF",
-      "url": "https://nepalncef.com/",
-      "type": "Company Portfolio",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Wednesday, March 11, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Raj Global Study",
-      "url": "https://rajglobalstudy.com/",
-      "type": "Consultancy",
-      "techStack": "WordPress",
-      "handledBy": "Sajesh",
-      "renewalDate": "Monday, June 22, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Smagogstil",
-      "url": "https://smagogstil.dk/",
-      "type": "Server & Domain Only",
-      "renewalDate": "Thursday, July 16, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "TBIC Jobs",
-      "url": "https://tbic.jobs/",
-      "type": "Server & Domain Only",
-      "renewalDate": "Thursday, March 5, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "Amatya Tarjali",
-      "url": "https://amatyarijal.com.np/",
-      "type": "Server Only",
-      "renewalDate": "Saturday, August 18, 2029",
-      "status": "Active"
-    }
-  ],
-
-  "upcomingProjects": [
-    {
-      "name": "Tractor Booking System",
-      "techStack": "Java + React",
-      "handledBy": "Sanjiv",
-      "deadline": "November 10, 2025",
-      "client": "Bishesh Deshar"
-    },
-    {
-      "name": "Tours and Travel Web App",
-      "techStack": "Java + React",
-      "handledBy": "Sudip",
-      "deadline": "November 10, 2025",
-      "client": "Rahul Dewan"
-    },
-    {
-      "name": "Ecommerce Buneko Nepal",
-      "techStack": "Java + React",
-      "handledBy": "Sudip",
-      "deadline": "November 10, 2025",
-      "client": "Juni Dangol"
-    },
-    {
-      "name": "Rental System",
-      "techStack": "Java + React",
-      "handledBy": "Saurav",
-      "deadline": "November 10, 2025",
-      "client": "Astha Karki"
-    },
-    {
-      "name": "MediTrack",
-      "techStack": "Java + React",
-      "handledBy": "Saurav & Sudip",
-      "deadline": "November 10, 2025",
-      "client": "Sudesha Basnet"
-    },
-    {
-      "name": "Restaurant Management and Reservation System",
-      "techStack": "Java + React",
-      "handledBy": "Sanjiv",
-      "deadline": "November 12, 2025",
-      "client": "Susmita Silwal"
-    }
-  ],
-
-  "servers": [
-    {
-      "name": "Agni Server",
-      "ip": "135.181.141.188",
-      "url": "https://agni.secureshieldserver.com:2083",
-      "nameservers": [
-        "ns1.agni.secureshieldserver.com",
-        "ns2.agni.secureshieldserver.com"
-      ],
-      "websites": [
-        "amatyarijal.com.np",
-        "everestwc.com",
-        "globalrisingtravel.com",
-        "leaftravelsandtour.com",
-        "oznepalservices.com.au",
-        "seropheroonline.com",
-        "smagogstil.dk",
-        "tbic.jobs"
-      ]
-    },
-    {
-      "name": "C5 Server",
-      "ip": "198.251.89.34",
-      "url": "https://c5.my-control-panel.com:2083",
-      "nameservers": [
-        "ns5.kailashcloud.com",
-        "ns6.kailashcloud.com"
-      ],
-      "websites": ["ainaatv.com"]
-    }
-  ],
-
-  "domains": [
-    {
-      "name": "damaruresources.com",
-      "renewalDate": "Friday, September 11, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "ekathas.com",
-      "renewalDate": "Sunday, November 9, 2025",
-      "status": "Active"
-    },
-    {
-      "name": "ainaatv.com",
-      "renewalDate": "Friday, May 15, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "nirvixtech.com",
-      "renewalDate": "Friday, May 8, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "seropheroonline.com",
-      "renewalDate": "Tuesday, April 21, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "globalrisingtravel.com",
-      "renewalDate": "Tuesday, September 1, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "sukiloproperties.ae",
-      "renewalDate": "Tuesday, August 11, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "zencareerhub.ae",
-      "renewalDate": "No Renewal (Handover Complete)",
-      "status": "Delivered"
-    },
-    {
-      "name": "levelup.edu.np",
-      "renewalDate": "Monday, September 15, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "deeptech.com.np",
-      "renewalDate": "Monday, September 15, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "pspkelectronics.ae",
-      "renewalDate": "Tuesday, August 11, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "leaftravelsandtour.com",
-      "renewalDate": "Friday, September 18, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "andrevaillancourt.com",
-      "renewalDate": "Friday, May 8, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "everestwc.com",
-      "renewalDate": "Tuesday, March 3, 2026",
-      "status": "On Hold"
-    },
-    {
-      "name": "towingbysbcs.com",
-      "renewalDate": "Thursday, June 11, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "nepalncef.com",
-      "renewalDate": "Wednesday, March 11, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "rajglobalstudy.com",
-      "renewalDate": "Monday, June 22, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "smagogstil.dk",
-      "renewalDate": "Thursday, July 16, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "tbic.jobs",
-      "renewalDate": "Thursday, March 5, 2026",
-      "status": "Active"
-    },
-    {
-      "name": "amatyarijal.com.np",
-      "renewalDate": "Saturday, August 18, 2029",
-      "status": "Active"
-    }
-  ],
-
-  "team": [
-    {
-      "name": "Nischal Tamang",
-      "role": "CTO & Team Leader",
-      "email": "tamangnischal2018@gmail.com",
-      "skills": [
-        "MERN",
-        "PERN",
-        "Hosting",
-        "Server Maintenance",
-        "Deployment"
-      ],
-      "avatar": "/team/nischal.jpeg"
-    },
-    {
-      "name": "Sanjiv Magar",
-      "role": "Senior Software Engineer (Full Stack)",
-      "email": "sanzivmagat80@gmail.com",
-      "skills": [
-        "Java",
-        "Python",
-        "Django",
-        "React"
-      ],
-      "avatar": "/team/sanjiv.jpg"
-    },
-    {
-      "name": "Sudip Pradhan",
-      "role": "Software Engineer (Full Stack)",
-      "email": "sudippradhanadgj@gmail.com",
-      "skills": [
-        "Java",
-        "Python",
-        "Django",
-        "React"
-      ],
-      "avatar": "/team/sudip.jpg"
-    },
-    {
-      "name": "Saurav Shrestha",
-      "role": "Associate Software Engineer (Full Stack)",
-      "email": "sauravstha486@gmail.com",
-      "skills": [
-        "Java",
-        "React",
-        "Python"
-      ],
-      "avatar": "/team/saurav.jpg"
-    },
-    {
-      "name": "Sonu Thapa Magar",
-      "role": "Associate Software Engineer (Full Stack)",
-      "email": "sonu@nirvix.tech",
-      "skills": [
-        "MERN"
-      ],
-      "avatar": "/team/sonu.jpg"
-    },
-    {
-      "name": "Sajesh Bajracharya",
-      "role": "Associate Software Engineer (Full Stack)",
-      "email": "sajesh.bajracharya.01@gmail.com",
-      "skills": [
-        "PHP",
-        "WordPress"
-      ],
-      "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
-    },
-    {
-      "name": "Gaurab Bahadur Magar",
-      "role": "Intern",
-      "email": "magargaurav2080@gmail.com",
-      "skills": [
-        "Frontend",
-        "HTML",
-        "CSS",
-        "React",
-        "JavaScript",
-        "Java Basic"
-      ],
-      "avatar": "/team/gaurab.jpg"
-    },
-    {
-      "name": "Dibin Pariyar",
-      "role": "SEO Analyst & WordPress Specialist",
-      "email": "dibinsunam145@gmail.com",
-      "skills": [
-        "SEO",
-        "WordPress"
-      ],
-      "avatar": "/team/dibin.jpg"
-    },
-    {
-      "name": "Anil Buda Magar",
-      "role": "Project Manager",
-      "email": "magaraneel35@gmail.com",
-      "skills": [
-        "Project Planning",
-        "Team Coordination",
-        "Client Communication"
-      ],
-      "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
-    },
-    {
-      "name": "Dipsan Dhital",
-      "role": "Intern",
-      "email": "dipsandhital12@gmail.com",
-      "skills": [
-        "Graphic Designing",
-        "React",
-        "Tailwind CSS"
-      ],
-      "avatar": "/team/dipsan.jpg"
-    }
-  ]
+    "projects": [
+        {
+            "name": "Damaru Resources",
+            "url": "https://damaruresources.com/",
+            "type": "Consultancy Website",
+            "techStack": [
+                "WordPress"
+            ],
+            "handledBy": "Sajesh Bajracharya",
+            "renewalDate": "Friday, September 11, 2026",
+            "status": "Under Development",
+            "client": "test",
+            "description": "test",
+            "assignedTo": [
+                "Nischal Tamang"
+            ],
+            "deadline": ""
+        },
+        {
+            "name": "Ekathas",
+            "url": "https://ekathas.com/",
+            "type": "Blogging Website",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Sunday, November 9, 2025",
+            "status": "Active"
+        },
+        {
+            "name": "Ainaa TV",
+            "url": "https://ainaatv.com/",
+            "type": "News Portal",
+            "techStack": "WordPress",
+            "handledBy": "Nischal",
+            "renewalDate": "Friday, May 15, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Nirvix Technology",
+            "url": "https://nirvixtech.com/",
+            "type": "Company Website",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Friday, May 8, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Serophero Online",
+            "url": "https://seropheroonline.com/",
+            "type": "News Portal",
+            "techStack": "WordPress",
+            "handledBy": "Nischal",
+            "renewalDate": "Tuesday, April 21, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Global Rising Travel",
+            "url": "https://globalrisingtravel.com/",
+            "type": "Tours & Travel",
+            "techStack": "WordPress",
+            "handledBy": "Nischal & Sajesh",
+            "renewalDate": "Tuesday, September 1, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Serophero Trekking",
+            "url": "https://trekking.seropheroonline.com",
+            "type": "Trekking Website",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Not purchased yet",
+            "status": "Under Development"
+        },
+        {
+            "name": "Sukilo Properties",
+            "url": "http://sukiloproperties.ae/",
+            "type": "Real Estate",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Tuesday, August 11, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Zen Career Hub",
+            "url": "https://zencareerhub.ae/",
+            "type": "Job Portal",
+            "techStack": "React + Django",
+            "handledBy": "Nischal & Sanjiv",
+            "renewalDate": "No Renewal (Handover Complete)",
+            "status": "Delivered"
+        },
+        {
+            "name": "LevelUp Education",
+            "url": "http://levelup.edu.np/",
+            "type": "Consultancy",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Monday, September 15, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "DeepTech",
+            "url": "https://deeptech.com.np/",
+            "type": "Ecommerce",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Monday, September 15, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "PSPK Electronics",
+            "url": "https://pspkelectronics.ae/",
+            "type": "Commerce Website",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Tuesday, August 11, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Leaf Travels and Tour",
+            "url": "https://leaftravelsandtour.com/",
+            "type": "Tours & Travel",
+            "techStack": "WordPress",
+            "handledBy": "Dibin",
+            "renewalDate": "Friday, September 18, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Andre Vaillancourt",
+            "url": "https://andrevaillancourt.com/",
+            "type": "Personal Portfolio",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Friday, May 8, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Everest WC",
+            "url": "https://everestwc.com/",
+            "type": "Consultancy & Manpower",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Tuesday, March 3, 2026",
+            "status": "On Hold"
+        },
+        {
+            "name": "Khalipana",
+            "status": "Terminated"
+        },
+        {
+            "name": "Lagaula",
+            "status": "Terminated"
+        },
+        {
+            "name": "Towing by SBCS",
+            "url": "https://towingbysbcs.com/",
+            "type": "Towing Company",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Thursday, June 11, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Education Community Health",
+            "status": "Terminated"
+        },
+        {
+            "name": "Oz Nepal Services",
+            "status": "Terminated"
+        },
+        {
+            "name": "Nepal NCEF",
+            "url": "https://nepalncef.com/",
+            "type": "Company Portfolio",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Wednesday, March 11, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Raj Global Study",
+            "url": "https://rajglobalstudy.com/",
+            "type": "Consultancy",
+            "techStack": "WordPress",
+            "handledBy": "Sajesh",
+            "renewalDate": "Monday, June 22, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Smagogstil",
+            "url": "https://smagogstil.dk/",
+            "type": "Server & Domain Only",
+            "renewalDate": "Thursday, July 16, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "TBIC Jobs",
+            "url": "https://tbic.jobs/",
+            "type": "Server & Domain Only",
+            "renewalDate": "Thursday, March 5, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "Amatya Tarjali",
+            "url": "https://amatyarijal.com.np/",
+            "type": "Server Only",
+            "renewalDate": "Saturday, August 18, 2029",
+            "status": "Active"
+        }
+    ],
+    "upcomingProjects": [
+        {
+            "name": "Tractor Booking System",
+            "techStack": "Java + React",
+            "handledBy": "Sanjiv",
+            "deadline": "November 10, 2025",
+            "client": "Bishesh Deshar"
+        },
+        {
+            "name": "Tours and Travel Web App",
+            "techStack": "Java + React",
+            "handledBy": "Sudip",
+            "deadline": "November 10, 2025",
+            "client": "Rahul Dewan"
+        },
+        {
+            "name": "Ecommerce Buneko Nepal",
+            "techStack": "Java + React",
+            "handledBy": "Sudip",
+            "deadline": "November 10, 2025",
+            "client": "Juni Dangol"
+        },
+        {
+            "name": "Rental System",
+            "techStack": "Java + React",
+            "handledBy": "Saurav",
+            "deadline": "November 10, 2025",
+            "client": "Astha Karki"
+        },
+        {
+            "name": "MediTrack",
+            "techStack": "Java + React",
+            "handledBy": "Saurav & Sudip",
+            "deadline": "November 10, 2025",
+            "client": "Sudesha Basnet"
+        },
+        {
+            "name": "Restaurant Management and Reservation System",
+            "techStack": "Java + React",
+            "handledBy": "Sanjiv",
+            "deadline": "November 12, 2025",
+            "client": "Susmita Silwal"
+        }
+    ],
+    "servers": [
+        {
+            "name": "Agni Server",
+            "ip": "135.181.141.188",
+            "url": "https://agni.secureshieldserver.com:2083",
+            "nameservers": [
+                "ns1.agni.secureshieldserver.com",
+                "ns2.agni.secureshieldserver.com"
+            ],
+            "websites": [
+                "amatyarijal.com.np",
+                "everestwc.com",
+                "globalrisingtravel.com",
+                "leaftravelsandtour.com",
+                "oznepalservices.com.au",
+                "seropheroonline.com",
+                "smagogstil.dk",
+                "tbic.jobs"
+            ]
+        },
+        {
+            "name": "C5 Server",
+            "ip": "198.251.89.34",
+            "url": "https://c5.my-control-panel.com:2083",
+            "nameservers": [
+                "ns5.kailashcloud.com",
+                "ns6.kailashcloud.com"
+            ],
+            "websites": [
+                "ainaatv.com"
+            ]
+        }
+    ],
+    "domains": [
+        {
+            "name": "damaruresources.com",
+            "renewalDate": "Friday, September 11, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "ekathas.com",
+            "renewalDate": "Sunday, November 9, 2025",
+            "status": "Active"
+        },
+        {
+            "name": "ainaatv.com",
+            "renewalDate": "Friday, May 15, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "nirvixtech.com",
+            "renewalDate": "Friday, May 8, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "seropheroonline.com",
+            "renewalDate": "Tuesday, April 21, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "globalrisingtravel.com",
+            "renewalDate": "Tuesday, September 1, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "sukiloproperties.ae",
+            "renewalDate": "Tuesday, August 11, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "zencareerhub.ae",
+            "renewalDate": "No Renewal (Handover Complete)",
+            "status": "Delivered"
+        },
+        {
+            "name": "levelup.edu.np",
+            "renewalDate": "Monday, September 15, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "deeptech.com.np",
+            "renewalDate": "Monday, September 15, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "pspkelectronics.ae",
+            "renewalDate": "Tuesday, August 11, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "leaftravelsandtour.com",
+            "renewalDate": "Friday, September 18, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "andrevaillancourt.com",
+            "renewalDate": "Friday, May 8, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "everestwc.com",
+            "renewalDate": "Tuesday, March 3, 2026",
+            "status": "On Hold"
+        },
+        {
+            "name": "towingbysbcs.com",
+            "renewalDate": "Thursday, June 11, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "nepalncef.com",
+            "renewalDate": "Wednesday, March 11, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "rajglobalstudy.com",
+            "renewalDate": "Monday, June 22, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "smagogstil.dk",
+            "renewalDate": "Thursday, July 16, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "tbic.jobs",
+            "renewalDate": "Thursday, March 5, 2026",
+            "status": "Active"
+        },
+        {
+            "name": "amatyarijal.com.np",
+            "renewalDate": "Saturday, August 18, 2029",
+            "status": "Active"
+        }
+    ],
+    "team": [
+        {
+            "name": "Nischal Tamang",
+            "role": "CTO & Team Leader",
+            "email": "tamangnischal2018@gmail.com",
+            "skills": [
+                "MERN",
+                "PERN",
+                "Hosting",
+                "Server Maintenance",
+                "Deployment"
+            ],
+            "avatar": "/team/nischal.jpeg"
+        },
+        {
+            "name": "Sanjiv Magar",
+            "role": "Senior Software Engineer (Full Stack)",
+            "email": "sanzivmagat80@gmail.com",
+            "skills": [
+                "Java",
+                "Python",
+                "Django",
+                "React"
+            ],
+            "avatar": "/team/sanjiv.jpg"
+        },
+        {
+            "name": "Sudip Pradhan",
+            "role": "Software Engineer (Full Stack)",
+            "email": "sudippradhanadgj@gmail.com",
+            "skills": [
+                "Java",
+                "Python",
+                "Django",
+                "React"
+            ],
+            "avatar": "/team/sudip.jpg"
+        },
+        {
+            "name": "Saurav Shrestha",
+            "role": "Associate Software Engineer (Full Stack)",
+            "email": "sauravstha486@gmail.com",
+            "skills": [
+                "Java",
+                "React",
+                "Python"
+            ],
+            "avatar": "/team/saurav.jpg"
+        },
+        {
+            "name": "Sonu Thapa Magar",
+            "role": "Associate Software Engineer (Full Stack)",
+            "email": "sonu@nirvix.tech",
+            "skills": [
+                "MERN"
+            ],
+            "avatar": "/team/sonu.jpg"
+        },
+        {
+            "name": "Sajesh Bajracharya",
+            "role": "Associate Software Engineer (Full Stack)",
+            "email": "sajesh.bajracharya.01@gmail.com",
+            "skills": [
+                "PHP",
+                "WordPress"
+            ],
+            "avatar": "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop&crop=face"
+        },
+        {
+            "name": "Gaurab Bahadur Magar",
+            "role": "Intern",
+            "email": "magargaurav2080@gmail.com",
+            "skills": [
+                "Frontend",
+                "HTML",
+                "CSS",
+                "React",
+                "JavaScript",
+                "Java Basic"
+            ],
+            "avatar": "/team/gaurab.jpg"
+        },
+        {
+            "name": "Dibin Pariyar",
+            "role": "SEO Analyst & WordPress Specialist",
+            "email": "dibinsunam145@gmail.com",
+            "skills": [
+                "SEO",
+                "WordPress"
+            ],
+            "avatar": "/team/dibin.jpg"
+        },
+        {
+            "name": "Anil Buda Magar",
+            "role": "Project Manager",
+            "email": "magaraneel35@gmail.com",
+            "skills": [
+                "Project Planning",
+                "Team Coordination",
+                "Client Communication"
+            ],
+            "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face"
+        },
+        {
+            "name": "Dipsan Dhital",
+            "role": "Intern",
+            "email": "dipsandhital12@gmail.com",
+            "skills": [
+                "Graphic Designing",
+                "React",
+                "Tailwind CSS"
+            ],
+            "avatar": "/team/dipsan.jpg"
+        }
+    ]
 }

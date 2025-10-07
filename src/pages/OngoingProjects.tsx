@@ -13,9 +13,11 @@ import {
 import { Search, Calendar, Users, FileText } from 'lucide-react';
 import { upcomingProjectService, UpcomingProject } from '../services/upcomingProjectService';
 import { team } from '../utils/dataLoader';
+import { projectService } from '../services/projectService';
 
 export default function OngoingProjects() {
   const [projects, setProjects] = useState<UpcomingProject[]>([]);
+  const [mainProjects, setMainProjects] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<UpcomingProject | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -29,6 +31,9 @@ export default function OngoingProjects() {
       setLoading(true);
       const data = await upcomingProjectService.getOngoingUpcomingProjects();
       setProjects(data);
+      const allMain = await projectService.list();
+      const activeMain = allMain.filter((p: any) => p.status === 'Under Development' || p.status === 'Maintenance');
+      setMainProjects(activeMain);
     } catch (error) {
       console.error('Failed to load ongoing projects:', error);
     } finally {
@@ -36,10 +41,13 @@ export default function OngoingProjects() {
     }
   };
 
-  const filteredProjects = projects.filter((project) =>
-    project.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.client.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    project.description.toLowerCase().includes(searchTerm.toLowerCase())
+  const filteredProjects = [
+    ...projects,
+    ...mainProjects,
+  ].filter((project: any) =>
+    (project.name || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (project.client || '').toLowerCase().includes(searchTerm.toLowerCase()) ||
+    (project.description || '').toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const getTeamMembers = (assignedTo: string[]) => {
@@ -113,11 +121,12 @@ export default function OngoingProjects() {
         </motion.div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project, index) => {
-            const daysUntilDeadline = getDaysUntilDeadline(project.deadline);
+          {filteredProjects.map((project: any, index) => {
+            const hasDeadline = Boolean(project.deadline);
+            const daysUntilDeadline = hasDeadline ? getDaysUntilDeadline(project.deadline) : 0;
             return (
               <motion.div
-                key={project.id}
+                key={project.id || project.name}
                 initial={{ opacity: 0, scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: index * 0.05 }}
@@ -133,20 +142,22 @@ export default function OngoingProjects() {
                         {project.name}
                       </CardTitle>
                       <Badge className="bg-yellow-100 text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400">
-                        Under Development
+                        {project.status || 'Under Development'}
                       </Badge>
                     </div>
                     <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
-                      {project.client}
+                      {project.client || project.type || ''}
                     </p>
                   </CardHeader>
                   <CardContent className="space-y-4">
-                    <div className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
-                      {project.description}
-                    </div>
+                    {project.description && (
+                      <div className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2">
+                        {project.description}
+                      </div>
+                    )}
 
                     <div className="flex flex-wrap gap-2">
-                      {project.techStack.slice(0, 4).map((tech) => (
+                      {(Array.isArray(project.techStack) ? project.techStack : (project.techStack ? [project.techStack] : [])).slice(0, 4).map((tech: string) => (
                         <span
                           key={tech}
                           className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md"
@@ -154,32 +165,33 @@ export default function OngoingProjects() {
                           {tech}
                         </span>
                       ))}
-                      {project.techStack.length > 4 && (
+                      {(Array.isArray(project.techStack) ? project.techStack.length : 0) > 4 && (
                         <span className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md">
-                          +{project.techStack.length - 4}
+                          +{(project.techStack as string[]).length - 4}
                         </span>
                       )}
                     </div>
 
                     <div className="space-y-2">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-500 dark:text-slate-400">Deadline</span>
-                        <span className={`font-semibold ${getDeadlineColor(daysUntilDeadline)}`}>
-                          {daysUntilDeadline < 0 ? `${Math.abs(daysUntilDeadline)} days overdue` :
-                           daysUntilDeadline === 0 ? 'Due today' :
-                           `${daysUntilDeadline} days left`}
-                        </span>
-                      </div>
-                      
+                      {hasDeadline && (
+                        <div className="flex items-center justify-between text-xs">
+                          <span className="text-slate-500 dark:text-slate-400">Deadline</span>
+                          <span className={`font-semibold ${getDeadlineColor(daysUntilDeadline)}`}>
+                            {daysUntilDeadline < 0 ? `${Math.abs(daysUntilDeadline)} days overdue` :
+                             daysUntilDeadline === 0 ? 'Due today' :
+                             `${daysUntilDeadline} days left`}
+                          </span>
+                        </div>
+                      )}
                       <div className="flex items-center justify-between text-xs">
                         <span className="text-slate-500 dark:text-slate-400">Team Members</span>
-                        <span className="font-semibold">{project.assignedTo.length}</span>
+                        <span className="font-semibold">{(project.assignedTo || []).length}</span>
                       </div>
                     </div>
 
                     <div className="flex items-center justify-between text-xs text-slate-500 dark:text-slate-400 pt-2 border-t border-slate-100 dark:border-slate-800">
-                      <span>ID: {project.id}</span>
-                      <span>{new Date(project.deadline).toLocaleDateString()}</span>
+                      {project.id && <span>ID: {project.id}</span>}
+                      {hasDeadline && <span>{new Date(project.deadline).toLocaleDateString()}</span>}
                     </div>
                   </CardContent>
                 </Card>
