@@ -229,7 +229,7 @@ export default function Projects() {
                   {(() => {
                     const base = getEffectiveProject(project);
                     const techStack = typeof base.techStack === 'string' ? [base.techStack] : (base.techStack || []);
-                    return techStack.slice(0, 4).map((tech) => (
+                    return techStack.slice(0, 4).map((tech: string) => (
                       <span
                         key={tech}
                         className="text-xs px-2 py-1 bg-slate-100 dark:bg-slate-800 rounded-md flex items-center gap-1"
