@@ -59,6 +59,7 @@ export default function Projects() {
   const [statusFilter, setStatusFilter] = useState('all');
   const [techFilter, setTechFilter] = useState('all');
   const { searchQuery } = useApp();
+  const [statusByName, setStatusByName] = useState<Record<string, string>>({});
 
   const allTechStacks = Array.from(
     new Set(projects.flatMap((p) => {
@@ -75,7 +76,8 @@ export default function Projects() {
       const matchesSearch =
         project.name.toLowerCase().includes(searchTerm.toLowerCase() || searchQuery.toLowerCase()) ||
         ((project as any).client && (project as any).client.toLowerCase().includes(searchTerm.toLowerCase() || searchQuery.toLowerCase()));
-      const matchesStatus = statusFilter === 'all' || project.status === statusFilter;
+      const effectiveStatus = statusByName[project.name] || project.status;
+      const matchesStatus = statusFilter === 'all' || effectiveStatus === statusFilter;
       
       // Handle tech stack filtering for both string and array formats
       let projectTechStack: string[] = [];
@@ -89,7 +91,7 @@ export default function Projects() {
 
       return matchesSearch && matchesStatus && matchesTech;
     });
-  }, [searchTerm, statusFilter, techFilter, searchQuery]);
+  }, [searchTerm, statusFilter, techFilter, searchQuery, statusByName]);
 
 
   return (
@@ -179,8 +181,8 @@ export default function Projects() {
                   <CardTitle className="text-lg font-bold line-clamp-2">
                     {project.name}
                   </CardTitle>
-                  <Badge className={statusColors[project.status]}>
-                    {project.status}
+                  <Badge className={statusColors[statusByName[project.name] || project.status]}>
+                    {statusByName[project.name] || project.status}
                   </Badge>
                 </div>
                 <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
@@ -253,12 +255,33 @@ export default function Projects() {
 
                 <div className="space-y-6 mt-6">
                   <div className="flex items-center gap-4">
-                    <Badge className={statusColors[selectedProject.status] || statusColors['Active']}>
-                      {selectedProject.status}
+                    <Badge className={statusColors[statusByName[selectedProject.name] || selectedProject.status] || statusColors['Active']}>
+                      {statusByName[selectedProject.name] || selectedProject.status}
                     </Badge>
                     <span className="text-sm text-slate-600 dark:text-slate-400">
                       {selectedProject.type}
                     </span>
+                  </div>
+
+                  <div>
+                    <h4 className="font-semibold mb-2">Change Status</h4>
+                    <Select
+                      value={statusByName[selectedProject.name] || selectedProject.status}
+                      onValueChange={(value) =>
+                        setStatusByName((prev) => ({ ...prev, [selectedProject.name]: value }))
+                      }
+                    >
+                      <SelectTrigger className="w-56">
+                        <SelectValue placeholder="Select status" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Active">Active</SelectItem>
+                        <SelectItem value="In Progress">In Progress</SelectItem>
+                        <SelectItem value="Completed">Completed</SelectItem>
+                        <SelectItem value="Planning">Planning</SelectItem>
+                        <SelectItem value="On Hold">On Hold</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
 
                   {selectedProject.url && (

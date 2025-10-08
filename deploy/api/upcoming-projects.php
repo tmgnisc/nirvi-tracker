@@ -58,7 +58,7 @@ function validateUpcomingProject($data, $isUpdate = false) {
     }
     
     // Validate status
-    $validStatuses = ['Upcoming', 'Under Development', 'Planning', 'Cancelled'];
+    $validStatuses = ['Upcoming', 'Under Development', 'Planning', 'Cancelled', 'Completed'];
     if (!in_array($data['status'], $validStatuses)) {
         return "Invalid status. Must be one of: " . implode(', ', $validStatuses);
     }
