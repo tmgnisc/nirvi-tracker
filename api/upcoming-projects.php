@@ -70,6 +70,75 @@ function sendProjectAssignmentEmailsDb($projectData): void
     $emailService->sendBulkProjectAssignmentEmails($projectData['assignedTo'], $projectData);
 }
 
+/**
+ * Sync an upcoming project into the main projects table.
+ * - If status is "Under Development" or "Completed", upsert into projects.
+ * - If other status, remove any matching row from projects.
+ */
+function syncUpcomingToProjects(mysqli $conn, array $upcoming): void
+{
+    $name = $upcoming['name'] ?? '';
+    if ($name === '') {
+        return;
+    }
+
+    $status = $upcoming['status'] ?? 'Upcoming';
+
+    // If not Under Development or Completed, remove any shadow project entry
+    if (!in_array($status, ['Under Development', 'Completed'], true)) {
+        $stmt = $conn->prepare('DELETE FROM projects WHERE name = ?');
+        if ($stmt) {
+            $stmt->bind_param('s', $name);
+            $stmt->execute();
+            $stmt->close();
+        }
+        return;
+    }
+
+    // Map status: Completed upcoming counts as Active project
+    $projectStatus = $status === 'Completed' ? 'Active' : $status;
+
+    $techStackJson  = json_encode($upcoming['techStack'] ?? []);
+    $assignedToJson = json_encode($upcoming['assignedTo'] ?? []);
+
+    // Upsert into projects by name
+    $sql = "
+        INSERT INTO projects
+            (name, url, type, tech_stack, handled_by, renewal_date, status, client, description, assigned_to, deadline)
+        VALUES
+            (?, NULL, NULL, ?, NULL, NULL, ?, ?, ?, ?, ?)
+        ON DUPLICATE KEY UPDATE
+            tech_stack = VALUES(tech_stack),
+            status = VALUES(status),
+            client = VALUES(client),
+            description = VALUES(description),
+            assigned_to = VALUES(assigned_to),
+            deadline = VALUES(deadline)
+    ";
+
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        return;
+    }
+
+    $client      = $upcoming['client'] ?? null;
+    $description = $upcoming['description'] ?? null;
+    $deadline    = $upcoming['deadline'] ?? null;
+
+    $stmt->bind_param(
+        'ssssss',
+        $name,
+        $techStackJson,
+        $projectStatus,
+        $client,
+        $description,
+        $assignedToJson,
+        $deadline
+    );
+    $stmt->execute();
+    $stmt->close();
+}
+
 switch ($method) {
     case 'GET':
         $result = $conn->query('SELECT * FROM upcoming_projects ORDER BY created_at DESC, id DESC');
@@ -147,6 +216,9 @@ switch ($method) {
         $project = rowToUpcomingProject($row);
 
         sendProjectAssignmentEmailsDb($project);
+
+        // Sync into main projects table
+        syncUpcomingToProjects($conn, $project);
 
         echo json_encode(['success' => true, 'data' => $project]);
         break;
@@ -229,6 +301,9 @@ switch ($method) {
         $project = rowToUpcomingProject($row);
 
         sendProjectAssignmentEmailsDb($project);
+
+        // Sync into main projects table
+        syncUpcomingToProjects($conn, $project);
 
         echo json_encode(['success' => true, 'data' => $project]);
         break;

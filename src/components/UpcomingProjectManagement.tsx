@@ -42,14 +42,16 @@ export default function UpcomingProjectManagement({ onProjectUpdate }: UpcomingP
     'Upcoming': 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
     'Under Development': 'bg-yellow-100 text-yellow-700 dark:bg-yellow-950/30 dark:text-yellow-400',
     'Planning': 'bg-orange-100 text-orange-700 dark:bg-orange-950/30 dark:text-orange-400',
-    'Cancelled': 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400'
+    'Cancelled': 'bg-red-100 text-red-700 dark:bg-red-950/30 dark:text-red-400',
+    'Completed': 'bg-green-100 text-green-700 dark:bg-green-950/30 dark:text-green-400',
   };
 
   const projectSections = {
     'Upcoming': projects.filter(p => p.status === 'Upcoming'),
     'Under Development': projects.filter(p => p.status === 'Under Development'),
     'Planning': projects.filter(p => p.status === 'Planning'),
-    'Cancelled': projects.filter(p => p.status === 'Cancelled')
+    'Cancelled': projects.filter(p => p.status === 'Cancelled'),
+    'Completed': projects.filter(p => p.status === 'Completed'),
   };
 
   useEffect(() => {
@@ -204,6 +206,7 @@ export default function UpcomingProjectManagement({ onProjectUpdate }: UpcomingP
               <SelectItem value="Under Development">Under Development</SelectItem>
               <SelectItem value="Planning">Planning</SelectItem>
               <SelectItem value="Cancelled">Cancelled</SelectItem>
+              <SelectItem value="Completed">Completed</SelectItem>
             </SelectContent>
           </Select>
         </div>
