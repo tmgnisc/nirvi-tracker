@@ -12,8 +12,8 @@ import {
 } from '../components/ui/dialog';
 import { Search, Calendar, Users, FileText } from 'lucide-react';
 import { upcomingProjectService, UpcomingProject } from '../services/upcomingProjectService';
-import { team } from '../utils/dataLoader';
 import { projectService } from '../services/projectService';
+import { metaService, TeamMember } from '../services/metaService';
 
 export default function OngoingProjects() {
   const [projects, setProjects] = useState<UpcomingProject[]>([]);
@@ -21,9 +21,11 @@ export default function OngoingProjects() {
   const [loading, setLoading] = useState(true);
   const [selectedProject, setSelectedProject] = useState<UpcomingProject | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [team, setTeam] = useState<TeamMember[]>([]);
 
   useEffect(() => {
     loadOngoingProjects();
+    loadTeam();
   }, []);
 
   const loadOngoingProjects = async () => {
@@ -38,6 +40,15 @@ export default function OngoingProjects() {
       console.error('Failed to load ongoing projects:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadTeam = async () => {
+    try {
+      const members = await metaService.getTeam();
+      setTeam(members);
+    } catch (error) {
+      console.error('Failed to load team:', error);
     }
   };
 

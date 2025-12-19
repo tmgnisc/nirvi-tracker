@@ -1,15 +1,10 @@
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '../components/ui/table';
-import { domains, getDaysUntil } from '../utils/dataLoader';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../components/ui/table';
+import { getDaysUntil } from '../utils/dataLoader';
+import { metaService, Domain } from '../services/metaService';
 import { Globe, TriangleAlert as AlertTriangle } from 'lucide-react';
 
 const statusColors: Record<string, string> = {
@@ -20,6 +15,33 @@ const statusColors: Record<string, string> = {
 };
 
 export default function Domains() {
+  const [domains, setDomains] = useState<Domain[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        setLoading(true);
+        const data = await metaService.getDomains();
+        setDomains(data);
+      } catch (e: any) {
+        setError(e.message || 'Failed to load domains');
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    );
+  }
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -53,7 +75,14 @@ export default function Domains() {
                 </TableRow>
               </TableHeader>
               <TableBody>
-                {domains.map((domain, index) => {
+                {error && (
+                  <TableRow>
+                    <TableCell colSpan={5} className="text-red-600">
+                      {error}
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!error && domains.map((domain, index) => {
                   const daysUntil = getDaysUntil(domain.renewalDate);
                   const isCritical = daysUntil <= 30 && daysUntil >= 0;
                   const percentage = Math.max(0, Math.min(100, (daysUntil / 365) * 100));

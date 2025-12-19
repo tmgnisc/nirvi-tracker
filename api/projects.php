@@ -4,176 +4,132 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-require_once 'email-service.php';
+require_once __DIR__ . '/db.php';
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-$deployDataFile = '../deploy/src-data/data.json'; // production deploy JSON
-$devDataFile = '../src/data/data.json';           // local dev JSON
-
-function readJsonData($file) {
-    if (!file_exists($file)) {
-        return [];
-    }
-    $content = file_get_contents($file);
-    return json_decode($content, true) ?: [];
-}
-
-function writeJsonData($file, $data) {
-    $json = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
-    return file_put_contents($file, $json) !== false;
-}
-
-function loadData() {
-    global $deployDataFile, $devDataFile;
-    $data = readJsonData($devDataFile);
-    if (empty($data)) {
-        $data = readJsonData($deployDataFile);
-    }
-    if (!isset($data['projects'])) {
-        $data['projects'] = [];
-    }
-    return $data;
-}
-
-function persistData($data) {
-    global $deployDataFile, $devDataFile;
-    $ok1 = writeJsonData($devDataFile, $data);
-    $ok2 = writeJsonData($deployDataFile, $data);
-    return $ok1 && $ok2;
-}
-
-function normalizeProject($p) {
-    $defaults = [
-        'name' => '',
-        'url' => '',
-        'type' => '',
-        'techStack' => [],
-        'handledBy' => '',
-        'renewalDate' => '',
-        'status' => 'Active',
-        'client' => '',
-        'description' => '',
-        'assignedTo' => [],
-        'deadline' => '',
-    ];
-    $merged = array_merge($defaults, $p ?: []);
-    if (is_string($merged['techStack'])) {
-        $merged['techStack'] = array_values(array_filter(array_map('trim', explode(',', (string)$merged['techStack']))));
-    }
-    if (!is_array($merged['techStack'])) {
-        $merged['techStack'] = [];
-    }
-    if (!isset($merged['assignedTo']) || !is_array($merged['assignedTo'])) {
-        $merged['assignedTo'] = [];
-    }
-    return $merged;
-}
-
+$conn = getDbConnection();
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 
 switch ($method) {
     case 'GET':
-        $data = loadData();
-        echo json_encode(['success' => true, 'data' => $data['projects']]);
+        $sql = "SELECT * FROM projects ORDER BY id DESC";
+        $result = $conn->query($sql);
+
+        if (!$result) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to fetch projects: ' . $conn->error]);
+            exit;
+        }
+
+        $projects = [];
+        while ($row = $result->fetch_assoc()) {
+            $projects[] = $row;
+        }
+
+        echo json_encode(['success' => true, 'data' => $projects]);
         break;
 
     case 'POST':
         if (!$input || !isset($input['name']) || trim($input['name']) === '') {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Missing required field: name']);
-            break;
+            exit;
         }
-        $data = loadData();
-        foreach ($data['projects'] as $proj) {
-            if (isset($proj['name']) && strtolower($proj['name']) === strtolower($input['name'])) {
-                http_response_code(409);
-                echo json_encode(['success' => false, 'error' => 'Project with this name already exists']);
-                exit;
-            }
-        }
-        $project = normalizeProject($input);
-        $data['projects'][] = $project;
-        if (persistData($data)) {
-            if (!empty($project['assignedTo'])) {
-                $emailService = new EmailService();
-                $emailService->sendBulkProjectAssignmentEmails($project['assignedTo'], $project);
-            }
-            echo json_encode(['success' => true, 'data' => $project]);
+
+        $name        = $conn->real_escape_string($input['name']);
+        $url         = isset($input['url']) ? $conn->real_escape_string($input['url']) : null;
+        $type        = isset($input['type']) ? $conn->real_escape_string($input['type']) : null;
+        $techStack   = isset($input['tech_stack']) ? $conn->real_escape_string($input['tech_stack']) : null;
+        $handledBy   = isset($input['handled_by']) ? $conn->real_escape_string($input['handled_by']) : null;
+        $renewalDate = isset($input['renewal_date']) ? $conn->real_escape_string($input['renewal_date']) : null;
+        $status      = isset($input['status']) ? $conn->real_escape_string($input['status']) : 'Active';
+        $client      = isset($input['client']) ? $conn->real_escape_string($input['client']) : null;
+        $description = isset($input['description']) ? $conn->real_escape_string($input['description']) : null;
+        $assignedTo  = isset($input['assigned_to']) ? $conn->real_escape_string($input['assigned_to']) : null;
+        $deadline    = isset($input['deadline']) ? $conn->real_escape_string($input['deadline']) : null;
+
+        $sql = "
+            INSERT INTO projects
+                (name, url, type, tech_stack, handled_by, renewal_date, status, client, description, assigned_to, deadline)
+            VALUES
+                ('$name', " .
+                ($url !== null ? "'$url'" : "NULL") . ", " .
+                ($type !== null ? "'$type'" : "NULL") . ", " .
+                ($techStack !== null ? "'$techStack'" : "NULL") . ", " .
+                ($handledBy !== null ? "'$handledBy'" : "NULL") . ", " .
+                ($renewalDate !== null ? "'$renewalDate'" : "NULL") . ", " .
+                "'$status', " .
+                ($client !== null ? "'$client'" : "NULL") . ", " .
+                ($description !== null ? "'$description'" : "NULL") . ", " .
+                ($assignedTo !== null ? "'$assignedTo'" : "NULL") . ", " .
+                ($deadline !== null ? "'$deadline'" : "NULL") .
+            ")
+        ";
+
+        if ($conn->query($sql)) {
+            echo json_encode(['success' => true, 'data' => ['id' => $conn->insert_id]]);
         } else {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Failed to save project']);
+            echo json_encode(['success' => false, 'error' => 'Failed to create project: ' . $conn->error]);
         }
         break;
 
     case 'PUT':
-        if (!isset($_GET['name']) || trim($_GET['name']) === '') {
+        parse_str($_SERVER['QUERY_STRING'] ?? '', $query);
+        if (!isset($query['id']) || !is_numeric($query['id'])) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Project name is required']);
-            break;
+            echo json_encode(['success' => false, 'error' => 'Project id is required']);
+            exit;
         }
-        $targetName = $_GET['name'];
-        $data = loadData();
-        $index = -1;
-        foreach ($data['projects'] as $i => $proj) {
-            if (isset($proj['name']) && strtolower($proj['name']) === strtolower($targetName)) {
-                $index = $i;
-                break;
+        $id = (int) $query['id'];
+
+        $fields = [];
+        foreach ([
+            'name', 'url', 'type', 'tech_stack',
+            'handled_by', 'renewal_date', 'status',
+            'client', 'description', 'assigned_to', 'deadline'
+        ] as $field) {
+            if (isset($input[$field])) {
+                $value = $conn->real_escape_string($input[$field]);
+                $fields[] = "$field = '$value'";
             }
         }
-        if ($index === -1) {
-            http_response_code(404);
-            echo json_encode(['success' => false, 'error' => 'Project not found']);
-            break;
+
+        if (empty($fields)) {
+            echo json_encode(['success' => false, 'error' => 'No fields to update']);
+            exit;
         }
-        $updated = array_merge($data['projects'][$index], $input ?: []);
-        $updated = normalizeProject($updated);
-        if (!isset($input['name']) || trim($input['name']) === '') {
-            $updated['name'] = $data['projects'][$index]['name'];
-        }
-        $data['projects'][$index] = $updated;
-        if (persistData($data)) {
-            if (!empty($updated['assignedTo'])) {
-                $emailService = new EmailService();
-                $emailService->sendBulkProjectAssignmentEmails($updated['assignedTo'], $updated);
-            }
-            echo json_encode(['success' => true, 'data' => $updated]);
+
+        $sql = "UPDATE projects SET " . implode(', ', $fields) . " WHERE id = $id";
+
+        if ($conn->query($sql)) {
+            echo json_encode(['success' => true]);
         } else {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Failed to update project']);
+            echo json_encode(['success' => false, 'error' => 'Failed to update project: ' . $conn->error]);
         }
         break;
 
     case 'DELETE':
-        if (!isset($_GET['name']) || trim($_GET['name']) === '') {
+        parse_str($_SERVER['QUERY_STRING'] ?? '', $query);
+        if (!isset($query['id']) || !is_numeric($query['id'])) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'error' => 'Project name is required']);
-            break;
+            echo json_encode(['success' => false, 'error' => 'Project id is required']);
+            exit;
         }
-        $targetName = $_GET['name'];
-        $data = loadData();
-        $index = -1;
-        foreach ($data['projects'] as $i => $proj) {
-            if (isset($proj['name']) && strtolower($proj['name']) === strtolower($targetName)) {
-                $index = $i;
-                break;
-            }
-        }
-        if ($index === -1) {
-            http_response_code(404);
-            echo json_encode(['success' => false, 'error' => 'Project not found']);
-            break;
-        }
-        $deleted = array_splice($data['projects'], $index, 1)[0];
-        if (persistData($data)) {
-            echo json_encode(['success' => true, 'data' => $deleted]);
+        $id = (int) $query['id'];
+
+        $sql = "DELETE FROM projects WHERE id = $id";
+        if ($conn->query($sql)) {
+            echo json_encode(['success' => true]);
         } else {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Failed to delete project']);
+            echo json_encode(['success' => false, 'error' => 'Failed to delete project: ' . $conn->error]);
         }
         break;
 
@@ -182,6 +138,7 @@ switch ($method) {
         echo json_encode(['success' => false, 'error' => 'Method not allowed']);
         break;
 }
+
 ?>
 
 

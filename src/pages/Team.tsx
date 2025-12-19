@@ -1,19 +1,33 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-} from '../components/ui/dialog';
-import { team, projects } from '../utils/dataLoader';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/dialog';
 import { Users, Briefcase } from 'lucide-react';
+import { metaService, TeamMember } from '../services/metaService';
+import { projectService, Project } from '../services/projectService';
 
 
 export default function Team() {
   const [selectedMember, setSelectedMember] = useState<any>(null);
+  const [team, setTeam] = useState<TeamMember[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [members, proj] = await Promise.all([
+          metaService.getTeam(),
+          projectService.list(),
+        ]);
+        setTeam(members);
+        setProjects(proj);
+      } catch {
+        // ignore errors; page will just render empty
+      }
+    };
+    load();
+  }, []);
 
   const getMemberProjects = (memberName: string) => {
     return projects.filter((p) => {

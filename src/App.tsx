@@ -7,7 +7,6 @@ import DashboardLayout from './components/layout/DashboardLayout';
 import Dashboard from './pages/Dashboard';
 import Projects from './pages/Projects';
 import UpcomingProjects from './pages/UpcomingProjects';
-import OngoingProjects from './pages/OngoingProjects';
 import Servers from './pages/Servers';
 import Domains from './pages/Domains';
 import Team from './pages/Team';
@@ -48,16 +47,6 @@ function AppRoutes() {
         }
       >
         <Route index element={<UpcomingProjects />} />
-      </Route>
-      <Route
-        path="/ongoing"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      >
-        <Route index element={<OngoingProjects />} />
       </Route>
       <Route
         path="/servers"

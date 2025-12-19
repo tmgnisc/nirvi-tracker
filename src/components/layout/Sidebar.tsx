@@ -1,22 +1,18 @@
 import { NavLink } from 'react-router-dom';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, FolderKanban, TrendingUp, Wrench, Server, Globe, Users } from 'lucide-react';
-import { getRenewalCount, getExpiredItems } from '../../utils/dataLoader';
+import { LayoutDashboard, FolderKanban, TrendingUp, Server, Globe, Users } from 'lucide-react';
 import logo from '../../assets/logo.png';
 
 const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/projects', label: 'Projects', icon: FolderKanban },
   { path: '/upcoming', label: 'Upcoming', icon: TrendingUp },
-  { path: '/ongoing', label: 'Ongoing', icon: Wrench },
   { path: '/servers', label: 'Servers', icon: Server },
   { path: '/domains', label: 'Domains', icon: Globe },
   { path: '/team', label: 'Team', icon: Users },
 ];
 
 export default function Sidebar() {
-  const renewalCount = getRenewalCount();
-  const expiredItems = getExpiredItems();
 
   return (
     <motion.aside
@@ -39,9 +35,6 @@ export default function Sidebar() {
         <ul className="space-y-1">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const showBadge =
-              (item.path === '/servers' || item.path === '/domains') && (renewalCount > 0 || expiredItems.length > 0);
-
             return (
               <li key={item.path}>
                 <NavLink
@@ -56,11 +49,6 @@ export default function Sidebar() {
                 >
                   <Icon className="w-5 h-5" />
                   <span className="font-medium">{item.label}</span>
-                  {showBadge && (
-                    <span className="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-                      {expiredItems.length > 0 ? expiredItems.length : renewalCount}
-                    </span>
-                  )}
                 </NavLink>
               </li>
             );

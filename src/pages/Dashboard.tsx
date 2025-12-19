@@ -1,12 +1,14 @@
 import { motion } from 'framer-motion';
+import { useEffect, useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '../components/ui/card';
 import { FolderKanban, Clock, CircleAlert as AlertCircle, DollarSign, Activity } from 'lucide-react';
 import { PieChart, Pie, Cell, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { projects, getRenewalCount, getExpiredItems, team } from '../utils/dataLoader';
-import { useState } from 'react';
+import { getRenewalCount, getExpiredItems } from '../utils/dataLoader';
 import { Button } from '../components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/select';
 import { Checkbox } from '../components/ui/checkbox';
+import { projectService } from '../services/projectService';
+import { metaService, TeamMember } from '../services/metaService';
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -28,6 +30,24 @@ export default function Dashboard() {
   const [sendWelcome, setSendWelcome] = useState<boolean>(false);
   const [sending, setSending] = useState<boolean>(false);
   const [resultMsg, setResultMsg] = useState<string>('');
+  const [projects, setProjects] = useState<any[]>([]);
+  const [team, setTeam] = useState<TeamMember[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [proj, members] = await Promise.all([
+          projectService.list(),
+          metaService.getTeam(),
+        ]);
+        setProjects(proj);
+        setTeam(members);
+      } catch {
+        // ignore errors for now; UI will just show zeros / empty
+      }
+    };
+    load();
+  }, []);
 
   const sendWelcomeEmail = async () => {
     if (!selectedMember || !sendWelcome) {

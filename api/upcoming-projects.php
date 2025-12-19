@@ -4,214 +4,284 @@ header('Access-Control-Allow-Origin: *');
 header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
-// Include email service
-require_once 'email-service.php';
+require_once __DIR__ . '/email-service.php';
+require_once __DIR__ . '/db.php';
 
-// Handle preflight requests
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
     exit();
 }
 
-$dataFile = '../src/data/data.json';
-$upcomingProjectsFile = '../data/upcoming-projects.json';
-
-// Helper function to read JSON data
-function readJsonData($file) {
-    if (!file_exists($file)) {
-        return [];
-    }
-    $content = file_get_contents($file);
-    return json_decode($content, true) ?: [];
-}
-
-// Helper function to write JSON data
-function writeJsonData($file, $data) {
-    $json = json_encode($data, JSON_PRETTY_PRINT);
-    return file_put_contents($file, $json) !== false;
-}
-
-// Helper function to generate new ID
-function generateId($projects, $prefix = 'UP') {
-    $maxNum = 0;
-    foreach ($projects as $project) {
-        if (preg_match('/^' . $prefix . '(\d+)$/', $project['id'], $matches)) {
-            $maxNum = max($maxNum, intval($matches[1]));
-        }
-    }
-    return $prefix . str_pad($maxNum + 1, 3, '0', STR_PAD_LEFT);
-}
-
-// Helper function to validate upcoming project data
-function validateUpcomingProject($data, $isUpdate = false) {
-    $required = ['name', 'client', 'description', 'deadline', 'techStack', 'status', 'assignedTo'];
-    
-    foreach ($required as $field) {
-        if (!isset($data[$field]) || empty($data[$field])) {
-            return "Missing required field: $field";
-        }
-    }
-    
-    // Validate deadline
-    if (!strtotime($data['deadline'])) {
-        return "Invalid deadline format";
-    }
-    
-    // Validate status
-    $validStatuses = ['Upcoming', 'Under Development', 'Planning', 'Cancelled', 'Completed'];
-    if (!in_array($data['status'], $validStatuses)) {
-        return "Invalid status. Must be one of: " . implode(', ', $validStatuses);
-    }
-    
-    // Validate assignedTo is array
-    if (!is_array($data['assignedTo'])) {
-        return "assignedTo must be an array";
-    }
-    
-    return true;
-}
-
+$conn = getDbConnection();
 $method = $_SERVER['REQUEST_METHOD'];
 $input = json_decode(file_get_contents('php://input'), true);
 
+function normalizeUpcomingPayload($data): array
+{
+    $required = ['name', 'client', 'description', 'deadline', 'techStack', 'status', 'assignedTo'];
+
+    foreach ($required as $field) {
+        if (!isset($data[$field]) || $data[$field] === '' || $data[$field] === null) {
+            throw new InvalidArgumentException("Missing required field: $field");
+        }
+    }
+
+    if (!strtotime($data['deadline'])) {
+        throw new InvalidArgumentException('Invalid deadline format');
+    }
+
+    $validStatuses = ['Upcoming', 'Under Development', 'Planning', 'Cancelled', 'Completed'];
+    if (!in_array($data['status'], $validStatuses, true)) {
+        throw new InvalidArgumentException('Invalid status. Must be one of: ' . implode(', ', $validStatuses));
+    }
+
+    if (!is_array($data['techStack'])) {
+        $data['techStack'] = [$data['techStack']];
+    }
+    if (!is_array($data['assignedTo'])) {
+        throw new InvalidArgumentException('assignedTo must be an array');
+    }
+
+    return $data;
+}
+
+function rowToUpcomingProject(array $row): array
+{
+    return [
+        'id'         => $row['code'] ?? '',
+        'name'       => $row['name'],
+        'client'     => $row['client'],
+        'description'=> $row['description'],
+        'techStack'  => $row['tech_stack'] ? (json_decode($row['tech_stack'], true) ?: []) : [],
+        'status'     => $row['status'],
+        'deadline'   => $row['deadline'],
+        'assignedTo' => $row['assigned_to'] ? (json_decode($row['assigned_to'], true) ?: []) : [],
+        'createdAt'  => $row['created_at'],
+        'updatedAt'  => $row['updated_at'],
+    ];
+}
+
+function sendProjectAssignmentEmailsDb($projectData): void
+{
+    if (empty($projectData['assignedTo'])) {
+        return;
+    }
+    $emailService = new EmailService();
+    $emailService->sendBulkProjectAssignmentEmails($projectData['assignedTo'], $projectData);
+}
+
 switch ($method) {
     case 'GET':
-        $upcomingProjects = readJsonData($upcomingProjectsFile);
-        echo json_encode(['success' => true, 'data' => $upcomingProjects]);
+        $result = $conn->query('SELECT * FROM upcoming_projects ORDER BY created_at DESC, id DESC');
+        if (!$result) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to fetch upcoming projects: ' . $conn->error]);
+            exit();
+        }
+        $rows = [];
+        while ($row = $result->fetch_assoc()) {
+            $rows[] = rowToUpcomingProject($row);
+        }
+        echo json_encode(['success' => true, 'data' => $rows]);
         break;
-        
+
     case 'POST':
-        $validation = validateUpcomingProject($input);
-        if ($validation !== true) {
+        try {
+            $data = normalizeUpcomingPayload($input ?? []);
+        } catch (InvalidArgumentException $e) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'error' => $validation]);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             break;
         }
-        
-        $upcomingProjects = readJsonData($upcomingProjectsFile);
-        $input['id'] = generateId($upcomingProjects);
-        $input['createdAt'] = date('Y-m-d H:i:s');
-        $input['updatedAt'] = date('Y-m-d H:i:s');
-        
-        $upcomingProjects[] = $input;
-        
-        if (writeJsonData($upcomingProjectsFile, $upcomingProjects)) {
-            // Send email notifications to assigned team members
-            sendProjectAssignmentEmails($input);
-            
-            echo json_encode(['success' => true, 'data' => $input]);
-        } else {
-            http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Failed to save upcoming project']);
+
+        // Generate new code like UP001
+        $res = $conn->query("SELECT code FROM upcoming_projects WHERE code LIKE 'UP%' ORDER BY id DESC LIMIT 1");
+        $lastCode = null;
+        if ($res && $row = $res->fetch_assoc()) {
+            $lastCode = $row['code'];
         }
+        $nextNum = 1;
+        if ($lastCode && preg_match('/^UP(\d+)$/', $lastCode, $m)) {
+            $nextNum = (int)$m[1] + 1;
+        }
+        $code = 'UP' . str_pad($nextNum, 3, '0', STR_PAD_LEFT);
+
+        $stmt = $conn->prepare("
+            INSERT INTO upcoming_projects
+                (code, name, client, description, tech_stack, status, deadline, assigned_to, created_at, updated_at)
+            VALUES
+                (?, ?, ?, ?, ?, ?, ?, ?, NOW(), NOW())
+        ");
+        if (!$stmt) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to prepare insert: ' . $conn->error]);
+            break;
+        }
+
+        $techStackJson  = json_encode($data['techStack']);
+        $assignedToJson = json_encode($data['assignedTo']);
+
+        $stmt->bind_param(
+            'ssssssss',
+            $code,
+            $data['name'],
+            $data['client'],
+            $data['description'],
+            $techStackJson,
+            $data['status'],
+            $data['deadline'],
+            $assignedToJson
+        );
+
+        if (!$stmt->execute()) {
+            $stmt->close();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to save upcoming project: ' . $stmt->error]);
+            break;
+        }
+        $stmt->close();
+
+        $id = $conn->insert_id;
+        $res = $conn->query("SELECT * FROM upcoming_projects WHERE id = " . (int)$id);
+        $row = $res->fetch_assoc();
+        $project = rowToUpcomingProject($row);
+
+        sendProjectAssignmentEmailsDb($project);
+
+        echo json_encode(['success' => true, 'data' => $project]);
         break;
-        
+
     case 'PUT':
-        if (!isset($_GET['id'])) {
+        if (!isset($_GET['id']) || $_GET['id'] === '') {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Project ID is required']);
             break;
         }
-        
-        $projectId = $_GET['id'];
-        $upcomingProjects = readJsonData($upcomingProjectsFile);
-        
-        $projectIndex = -1;
-        foreach ($upcomingProjects as $index => $project) {
-            if ($project['id'] === $projectId) {
-                $projectIndex = $index;
-                break;
-            }
+        $code = $_GET['id'];
+
+        $stmt = $conn->prepare('SELECT * FROM upcoming_projects WHERE code = ?');
+        if (!$stmt) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to prepare select: ' . $conn->error]);
+            break;
         }
-        
-        if ($projectIndex === -1) {
+        $stmt->bind_param('s', $code);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $existing = $res->fetch_assoc();
+        $stmt->close();
+
+        if (!$existing) {
             http_response_code(404);
             echo json_encode(['success' => false, 'error' => 'Upcoming project not found']);
             break;
         }
-        
-        $validation = validateUpcomingProject($input, true);
-        if ($validation !== true) {
+
+        $payload = array_merge(
+            rowToUpcomingProject($existing),
+            $input ?? []
+        );
+
+        try {
+            $data = normalizeUpcomingPayload($payload);
+        } catch (InvalidArgumentException $e) {
             http_response_code(400);
-            echo json_encode(['success' => false, 'error' => $validation]);
+            echo json_encode(['success' => false, 'error' => $e->getMessage()]);
             break;
         }
-        
-        $input['id'] = $projectId; // Ensure ID doesn't change
-        $input['updatedAt'] = date('Y-m-d H:i:s');
-        
-        // Preserve created date if it exists
-        if (isset($upcomingProjects[$projectIndex]['createdAt'])) {
-            $input['createdAt'] = $upcomingProjects[$projectIndex]['createdAt'];
-        }
-        
-        $upcomingProjects[$projectIndex] = $input;
-        
-        if (writeJsonData($upcomingProjectsFile, $upcomingProjects)) {
-            // Send email notifications to assigned team members
-            sendProjectAssignmentEmails($input);
-            
-            echo json_encode(['success' => true, 'data' => $input]);
-        } else {
+
+        $stmt = $conn->prepare("
+            UPDATE upcoming_projects
+            SET name = ?, client = ?, description = ?, tech_stack = ?, status = ?, deadline = ?, assigned_to = ?, updated_at = NOW()
+            WHERE code = ?
+        ");
+        if (!$stmt) {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Failed to update upcoming project']);
+            echo json_encode(['success' => false, 'error' => 'Failed to prepare update: ' . $conn->error]);
+            break;
         }
+
+        $techStackJson  = json_encode($data['techStack']);
+        $assignedToJson = json_encode($data['assignedTo']);
+
+        $stmt->bind_param(
+            'ssssssss',
+            $data['name'],
+            $data['client'],
+            $data['description'],
+            $techStackJson,
+            $data['status'],
+            $data['deadline'],
+            $assignedToJson,
+            $code
+        );
+
+        if (!$stmt->execute()) {
+            $stmt->close();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to update upcoming project: ' . $stmt->error]);
+            break;
+        }
+        $stmt->close();
+
+        $res = $conn->query("SELECT * FROM upcoming_projects WHERE code = '" . $conn->real_escape_string($code) . "'");
+        $row = $res->fetch_assoc();
+        $project = rowToUpcomingProject($row);
+
+        sendProjectAssignmentEmailsDb($project);
+
+        echo json_encode(['success' => true, 'data' => $project]);
         break;
-        
+
     case 'DELETE':
-        if (!isset($_GET['id'])) {
+        if (!isset($_GET['id']) || $_GET['id'] === '') {
             http_response_code(400);
             echo json_encode(['success' => false, 'error' => 'Project ID is required']);
             break;
         }
-        
-        $projectId = $_GET['id'];
-        $upcomingProjects = readJsonData($upcomingProjectsFile);
-        
-        $projectIndex = -1;
-        foreach ($upcomingProjects as $index => $project) {
-            if ($project['id'] === $projectId) {
-                $projectIndex = $index;
-                break;
-            }
+        $code = $_GET['id'];
+
+        $stmt = $conn->prepare('SELECT * FROM upcoming_projects WHERE code = ?');
+        if (!$stmt) {
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to prepare select: ' . $conn->error]);
+            break;
         }
-        
-        if ($projectIndex === -1) {
+        $stmt->bind_param('s', $code);
+        $stmt->execute();
+        $res = $stmt->get_result();
+        $existing = $res->fetch_assoc();
+        $stmt->close();
+
+        if (!$existing) {
             http_response_code(404);
             echo json_encode(['success' => false, 'error' => 'Upcoming project not found']);
             break;
         }
-        
-        $deletedProject = array_splice($upcomingProjects, $projectIndex, 1)[0];
-        
-        if (writeJsonData($upcomingProjectsFile, $upcomingProjects)) {
-            echo json_encode(['success' => true, 'data' => $deletedProject]);
-        } else {
+
+        $stmt = $conn->prepare('DELETE FROM upcoming_projects WHERE code = ?');
+        if (!$stmt) {
             http_response_code(500);
-            echo json_encode(['success' => false, 'error' => 'Failed to delete upcoming project']);
+            echo json_encode(['success' => false, 'error' => 'Failed to prepare delete: ' . $conn->error]);
+            break;
         }
+        $stmt->bind_param('s', $code);
+        if (!$stmt->execute()) {
+            $stmt->close();
+            http_response_code(500);
+            echo json_encode(['success' => false, 'error' => 'Failed to delete upcoming project: ' . $stmt->error]);
+            break;
+        }
+        $stmt->close();
+
+        $project = rowToUpcomingProject($existing);
+        echo json_encode(['success' => true, 'data' => $project]);
         break;
-        
+
     default:
         http_response_code(405);
         echo json_encode(['success' => false, 'error' => 'Method not allowed']);
         break;
 }
 
-/**
- * Send email notifications to assigned team members
- */
-function sendProjectAssignmentEmails($projectData) {
-    if (!isset($projectData['assignedTo']) || empty($projectData['assignedTo'])) {
-        return; // No team members assigned
-    }
-    
-    $emailService = new EmailService();
-    
-    // Send emails to all assigned team members
-    $results = $emailService->sendBulkProjectAssignmentEmails($projectData['assignedTo'], $projectData);
-    
-    // Log email results (optional - you can remove this if not needed)
-    error_log("Email notification results for project '{$projectData['name']}': " . json_encode($results));
-}
 ?>

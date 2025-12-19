@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useApp } from '../../contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
@@ -15,13 +15,77 @@ import {
 } from '../ui/dropdown-menu';
 import { Badge } from '../ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { getRenewalCount, getExpiredItems, getDaysUntil, projects, domains } from '../../utils/dataLoader';
+import { getDaysUntil } from '../../utils/dataLoader';
+import { projectService, Project } from '../../services/projectService';
+import { metaService, Domain } from '../../services/metaService';
 
 export default function Navbar() {
   const { user, logout, darkMode, toggleDarkMode, searchQuery, setSearchQuery } = useApp();
   const navigate = useNavigate();
   const [showSearch, setShowSearch] = useState(false);
   const [showNotifications, setShowNotifications] = useState(false);
+   const [projects, setProjects] = useState<Project[]>([]);
+  const [domains, setDomains] = useState<Domain[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [proj, dom] = await Promise.all([
+          projectService.list(),
+          metaService.getDomains(),
+        ]);
+        setProjects(proj);
+        setDomains(dom);
+      } catch {
+        // ignore errors; notifications will just be empty
+      }
+    };
+    load();
+  }, []);
+
+  const getExpiredItems = () => {
+    const expired: Array<{ name: string; type: string; renewalDate: string }> = [];
+    projects.forEach((project) => {
+      if (project.renewalDate === 'Expired') {
+        expired.push({ name: project.name, type: 'Project', renewalDate: project.renewalDate! });
+      }
+    });
+    domains.forEach((domain) => {
+      if (domain.renewalDate === 'Expired') {
+        expired.push({ name: domain.name, type: 'Domain', renewalDate: domain.renewalDate });
+      }
+    });
+    return expired;
+  };
+
+  const getRenewalCount = () => {
+    const renewalItems = new Set<string>();
+    projects.forEach((project) => {
+      if (project.renewalDate === 'Expired') {
+        renewalItems.add(`project:${project.name}`);
+      } else if (
+        project.renewalDate &&
+        project.renewalDate !== 'Not purchased yet' &&
+        project.renewalDate !== 'No Renewal (Handover Complete)'
+      ) {
+        const daysUntil = getDaysUntil(project.renewalDate);
+        if (daysUntil <= 7 && daysUntil >= 0) {
+          renewalItems.add(`project:${project.name}`);
+        }
+      }
+    });
+    domains.forEach((domain) => {
+      if (domain.renewalDate === 'Expired') {
+        renewalItems.add(`domain:${domain.name}`);
+      } else if (domain.renewalDate) {
+        const daysUntil = getDaysUntil(domain.renewalDate);
+        if (daysUntil <= 7 && daysUntil >= 0) {
+          renewalItems.add(`domain:${domain.name}`);
+        }
+      }
+    });
+    return renewalItems.size;
+  };
 
   const renewalCount = getRenewalCount();
   const expiredItems = getExpiredItems();

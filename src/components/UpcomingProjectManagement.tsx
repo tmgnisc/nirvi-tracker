@@ -12,7 +12,7 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { Plus, Edit, Trash2, Users, Calendar, Code } from 'lucide-react';
 import { upcomingProjectService, UpcomingProject, CreateUpcomingProjectData } from '../services/upcomingProjectService';
 import { useToast } from '../hooks/use-toast';
-import { team } from '../utils/dataLoader';
+import { metaService, TeamMember } from '../services/metaService';
 
 interface UpcomingProjectManagementProps {
   onProjectUpdate?: () => void;
@@ -36,6 +36,7 @@ export default function UpcomingProjectManagement({ onProjectUpdate }: UpcomingP
   });
   const [techStackInput, setTechStackInput] = useState('');
   const { toast } = useToast();
+  const [team, setTeam] = useState<TeamMember[]>([]);
 
   const statusColors = {
     'Upcoming': 'bg-blue-100 text-blue-700 dark:bg-blue-950/30 dark:text-blue-400',
@@ -53,6 +54,7 @@ export default function UpcomingProjectManagement({ onProjectUpdate }: UpcomingP
 
   useEffect(() => {
     loadProjects();
+    loadTeam();
   }, []);
 
   const loadProjects = async () => {
@@ -64,6 +66,15 @@ export default function UpcomingProjectManagement({ onProjectUpdate }: UpcomingP
       console.error('Failed to load upcoming projects:', error);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadTeam = async () => {
+    try {
+      const members = await metaService.getTeam();
+      setTeam(members);
+    } catch (error) {
+      console.error('Failed to load team:', error);
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/card';
 import { Badge } from '../components/ui/badge';
@@ -19,9 +19,9 @@ import {
   SelectValue,
 } from '../components/ui/select';
 import { Search, Filter, X } from 'lucide-react';
-import { projects, team } from '../utils/dataLoader';
 import { useToast } from '../hooks/use-toast';
-import { projectService } from '../services/projectService';
+import { projectService, Project } from '../services/projectService';
+import { metaService, TeamMember } from '../services/metaService';
 import { useApp } from '../contexts/AppContext';
 
 const techIcons: Record<string, string> = {
@@ -84,9 +84,27 @@ export default function Projects() {
   const [savingEdit, setSavingEdit] = useState(false);
   const [savingStatus, setSavingStatus] = useState(false);
   const [creating, setCreating] = useState(false);
+  const [loadedProjects, setLoadedProjects] = useState<Project[]>([]);
+  const [team, setTeam] = useState<TeamMember[]>([]);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [proj, members] = await Promise.all([
+          projectService.list(),
+          metaService.getTeam(),
+        ]);
+        setLoadedProjects(proj);
+        setTeam(members);
+      } catch {
+        // ignore errors; UI will just show empty list
+      }
+    };
+    load();
+  }, []);
 
   const allTechStacks = Array.from(
-    new Set(projects.flatMap((p) => {
+    new Set(loadedProjects.flatMap((p) => {
       // Handle both string and array techStack formats
       if (typeof p.techStack === 'string') {
         return [p.techStack];
@@ -101,8 +119,8 @@ export default function Projects() {
   };
 
   const allProjects = useMemo(() => {
-    return [...projects, ...extraProjects];
-  }, [extraProjects]);
+    return [...loadedProjects, ...extraProjects];
+  }, [loadedProjects, extraProjects]);
 
   const filteredProjects = useMemo(() => {
     return allProjects.filter((project) => {
